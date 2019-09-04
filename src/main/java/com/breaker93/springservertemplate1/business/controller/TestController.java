@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     @GetMapping
     public String get(){
+        if (true) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
         return "Hello,Tianjin!";
     }
 
