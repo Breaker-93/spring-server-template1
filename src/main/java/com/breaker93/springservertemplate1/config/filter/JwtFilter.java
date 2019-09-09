@@ -5,6 +5,7 @@ import com.breaker93.springservertemplate1.utils.Result.ResultEnums;
 import com.breaker93.springservertemplate1.utils.Result.ResultUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,19 +39,21 @@ public class JwtFilter extends GenericFilterBean {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
         try {
             String jwtToken = req.getHeader(tokenHeader);
-            if(jwtToken == null) {
+            if(jwtToken == null || jwtToken.indexOf(tokenPrefix) == -1) {
                 throw new SignatureException("");
             }
             Claims claims = Jwts.parser().setSigningKey(secret).parseClaimsJws(jwtToken.replace(tokenPrefix, ""))
                     .getBody();
-            String username = claims.getSubject();//获取当前登录用户名
+            // 获取当前登录用户名
+            String username = claims.getSubject();
             List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList((String) claims.get("authorities"));
             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(token);
+            filterChain.doFilter(req,servletResponse);
         }catch (Exception e) {
-            System.out.println(e);
+           // System.out.println(e);
             String resJson;
-            if (e instanceof SignatureException) {
+            if (e instanceof SignatureException || e instanceof MalformedJwtException) {
                 // 认证失败（未携带令牌或令牌签名错误）
                 resJson = JSON.toJSONString(ResultUtil.build(ResultEnums.UNAUTHORIZED));
             } else {
@@ -63,6 +66,5 @@ public class JwtFilter extends GenericFilterBean {
             out.flush();
             out.close();
         }
-        filterChain.doFilter(req,servletResponse);
     }
 }

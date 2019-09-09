@@ -5,11 +5,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletRequest;
+
 @RestController
 @RequestMapping("/test")
 public class TestController {
     @GetMapping
-    public String get(){
+    public String get(HttpServletRequest request){
+        System.out.println(request.getUserPrincipal());
+        System.out.println(request.isUserInRole("ROLE_USER"));
         if (true) {
             throw new ArrayIndexOutOfBoundsException();
         }
