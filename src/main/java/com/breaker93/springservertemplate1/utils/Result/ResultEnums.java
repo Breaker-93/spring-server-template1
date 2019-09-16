@@ -8,6 +8,7 @@ public enum  ResultEnums {
     UNAUTHORIZED("402", "认证失败（未携带令牌或令牌签名错误）"),
     AUTHORIZE_EXPIRE("403", "登录认证已过期"),
     NOT_FIND("404", "接口找不到"),
+    PERMISSION_DENIED("405", "权限不足"),
     BUSINESS_ERROR("500", "业务逻辑错误"),
     SYSTEM_EXCEPTION("501", "系统未知异常");
 

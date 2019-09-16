@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -35,6 +36,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return new JwtFilter();
     }
 
+    @Bean
+    public AccessDeniedHandler getAccessDeniedHandler() {
+        return new SecurityAccessDeniedHandler();
+    }
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
@@ -45,6 +51,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)  //禁用session
                 .and()
                 .formLogin() // 被拦截的请求会自动跳转至默认的登录页面
+                .and()
+                .exceptionHandling().accessDeniedHandler(getAccessDeniedHandler())
                 .and()
                 .addFilterBefore(getJwtLoginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(getJwtFilter(),UsernamePasswordAuthenticationFilter.class)
