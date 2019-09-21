@@ -1,12 +1,17 @@
 package com.breaker93.springservertemplate1.config.filter;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.breaker93.springservertemplate1.sys.entity.SysUser;
+import com.breaker93.springservertemplate1.sys.mapper.SysUserMapper;
 import com.breaker93.springservertemplate1.utils.Result.ResultEnums;
 import com.breaker93.springservertemplate1.utils.Result.ResultUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,6 +39,9 @@ public class JwtFilter extends GenericFilterBean {
     @Value("${jwt.secret}")
     private String secret;
 
+    @Autowired
+    SysUserMapper sysUserMapper;
+
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest req = (HttpServletRequest) servletRequest;
@@ -46,8 +54,11 @@ public class JwtFilter extends GenericFilterBean {
                     .getBody();
             // 获取当前登录用户名
             String username = claims.getSubject();
+            QueryWrapper<SysUser> queryWrapper = Wrappers.<SysUser>query()
+                    .eq("username", username);
+            SysUser sysUser = sysUserMapper.selectOne(queryWrapper);
             List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList((String) claims.get("authorities"));
-            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(sysUser, null, authorities);
             SecurityContextHolder.getContext().setAuthentication(token);
             filterChain.doFilter(req,servletResponse);
         }catch (Exception e) {
