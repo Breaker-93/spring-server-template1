@@ -7,12 +7,13 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-public class User implements UserDetails {
+public class SysUser implements UserDetails {
+    private String businessId;
     private String username;
     private String password;
     private  Collection<? extends GrantedAuthority>  authorities;
 
-    public User(String username, String password, String authorities) {
+    public SysUser(String username, String password, String authorities) {
         this.username = username;
         this.password = password;
         this.authorities = Collections.singleton(new SimpleGrantedAuthority(authorities));
@@ -21,6 +22,14 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
+    }
+
+    public String getBusinessId() {
+        return businessId;
+    }
+
+    public void setBusinessId(String businessId) {
+        this.businessId = businessId;
     }
 
     @Override
