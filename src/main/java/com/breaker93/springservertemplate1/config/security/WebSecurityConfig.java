@@ -46,7 +46,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin() // 被拦截的请求会自动跳转至默认的登录页面
                 .and()
-                .exceptionHandling().accessDeniedHandler(getAccessDeniedHandler())
+                .exceptionHandling()
+                .authenticationEntryPoint(new RestAuthenticationEntryPoint())
                 .and()
                 .addFilterBefore(getJwtLoginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(getJwtFilter(),UsernamePasswordAuthenticationFilter.class)
